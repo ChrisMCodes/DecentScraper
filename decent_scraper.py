@@ -48,7 +48,8 @@ class Pagedata:
         It calls the methods that will always apply when this program is run
         :return:
         """
-        self.scrape_class()
+        data_attr = self.get_attr()
+        self.scrape_class(data_attr)
         self.results = self.beautiful_scrape()
         self.print_results(self.results)
 
@@ -217,15 +218,40 @@ class Pagedata:
             self.exit_program()
 
 
-    def scrape_class(self):
+    def get_attr():
         """
-        This is really just getting the HTML class to scrape.
-        TODO: add more options (id, elements, etc)
+        selects id/element/class
+        """
+        choices = {1: "", 2: "class_=", 3: "id="}
+        valid = False
+        while not valid:
+            print("\nHow would you like to search the page?")
+            print("Search by element:       1")
+            print("Search by class:         2")
+            print("Search by id:            3")
+            
+            try:
+                choice = int(input("Please enter the number that corresponds to your choice: "))
+            except:
+                print("Invalid choice.\n")
+                choice = 0
+                
+            valid = choice in choices
+                
+        return choices[choice]
+    
+    
+    def scrape_class(self, data_attr):
+        """
+        This is really just getting the HTML 
+        element, id, or class to scrape.
         :return:
         """
-        self.cls = input("Please enter class to scrape: ")
+        print(f"Please enter {data_attr} to scrape: ")
+        self.cls = input()
+        
 
-    def beautiful_scrape(self):
+    def beautiful_scrape(self, data_attr):
         """
         parses HTML of site
         creates a list of results
@@ -235,7 +261,7 @@ class Pagedata:
         :return:
         """
         soup = BeautifulSoup(self.page.content, "html.parser")
-        resulting_text = soup.find_all(class_=self.cls)
+        resulting_text = soup.find_all(data_attr + self.cls)
         self.results = resulting_text
         return resulting_text
 
