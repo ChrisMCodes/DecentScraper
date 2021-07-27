@@ -50,7 +50,7 @@ class Pagedata:
         """
         data_attr = self.get_attr()
         self.scrape_class(data_attr)
-        self.results = self.beautiful_scrape()
+        self.results = self.beautiful_scrape(data_attr)
         self.print_results(self.results)
 
     def additional_options(self):
@@ -120,8 +120,13 @@ class Pagedata:
         to create a .txt of the data
         :return:
         """
-        file = TextOutput()
-        file.write_to_txt_file(self.results)
+        try:
+            file = TextOutput()
+            file.write_to_txt_file(self.results)
+        except Exception as e:
+            print("Something went wrong.")
+            print("The computer provides this message: " + e)
+            print("Exiting.")
 
     def csv_file(self):
         """
@@ -130,8 +135,13 @@ class Pagedata:
         to create a .csv of the data
         :return:
         """
-        file = CSVOutput()
-        file.write_to_csv_file(self.results)
+        try:
+            file = CSVOutput()
+            file.write_to_csv_file(self.results)
+        except Exception as e:
+            print("Something went wrong.")
+            print("The computer provides this message: " + e)
+            print("Exiting.")
 
     def soviet_joke(self):
         """
@@ -217,8 +227,7 @@ class Pagedata:
             print("The program will now exit. Goodbye!")
             self.exit_program()
 
-
-    def get_attr():
+    def get_attr(self):
         """
         selects id/element/class
         """
@@ -229,27 +238,32 @@ class Pagedata:
             print("Search by element:       1")
             print("Search by class:         2")
             print("Search by id:            3")
-            
+
             try:
-                choice = int(input("Please enter the number that corresponds to your choice: "))
+                choice = int(
+                    input("Please enter the number that corresponds to your choice: "))
             except:
                 print("Invalid choice.\n")
                 choice = 0
-                
+
             valid = choice in choices
-                
+
         return choices[choice]
-    
-    
+
     def scrape_class(self, data_attr):
         """
         This is really just getting the HTML 
         element, id, or class to scrape.
         :return:
         """
-        print(f"Please enter {data_attr} to scrape: ")
+        attr_name = "id"
+        if data_attr == "":
+            attr_name = "element"
+        elif data_attr == "class_=":
+            attr_name = "class"
+
+        print(f"Please enter {attr_name} to scrape: ", end="")
         self.cls = input()
-        
 
     def beautiful_scrape(self, data_attr):
         """
@@ -261,7 +275,12 @@ class Pagedata:
         :return:
         """
         soup = BeautifulSoup(self.page.content, "html.parser")
-        resulting_text = soup.find_all(data_attr + self.cls)
+        if data_attr == "class_=":
+            resulting_text = soup.find_all(class_=self.cls)
+        elif data_attr == "id=":
+            resulting_text = soup.find_all(id=self.cls)
+        else:
+            resulting_text = soup.find_all(self.cls)
         self.results = resulting_text
         return resulting_text
 
@@ -281,6 +300,8 @@ class Pagedata:
 # so please feel free to break it and
 # let me know what needs to be updated
 #
+
+
 class CSVOutput:
     direction = -1
     filename = ""
@@ -295,7 +316,8 @@ class CSVOutput:
         gets filename from user
         :return:
         """
-        self.filename = input("Please enter the name of the file you would like to write: ")
+        self.filename = input(
+            "Please enter the name of the file you would like to write: ")
 
     def check_filename(self):
         """
@@ -314,9 +336,9 @@ class CSVOutput:
 
         while not valid:
             print("Please choose one of the following directions: ")
-            print("1 for vertical. Your data would look like this on a spreadsheet: "\
+            print("1 for vertical. Your data would look like this on a spreadsheet: "
                   "\ndata\ndata\ndata")
-            print("2 for horizontal. Your data would look like this on a spreadsheet: "\
+            print("2 for horizontal. Your data would look like this on a spreadsheet: "
                   "data, data, data")
 
             try:
@@ -325,7 +347,7 @@ class CSVOutput:
                 print("Invalid input")
             except TypeError:
                 print("Invalid input")
-            except: # yes, I know that pep8 doesn't like this
+            except:  # yes, I know that pep8 doesn't like this
                 print("Invalid input")
             finally:
                 if self.direction not in [1, 2]:
@@ -361,6 +383,8 @@ class CSVOutput:
 # Like the CSVOutput class,
 # this class has undergone very little testing
 #
+
+
 class TextOutput:
     filename = ""
 
@@ -373,7 +397,8 @@ class TextOutput:
         gets filename from user
         :return:
         """
-        self.filename = input("Please enter the name of the file you would like to write: ")
+        self.filename = input(
+            "Please enter the name of the file you would like to write: ")
 
     def check_filename(self):
         """
@@ -409,6 +434,7 @@ class TextOutput:
 # This is a rather silly convention, isn't it?
 #
 if __name__ == '__main__':
-    site = input("Please enter URL to scrape: ") # This is my only global(ish). Gets URL from user
-    Pagedata(site) # <-- The magic and the madness happen here
+    # This is my only global(ish). Gets URL from user
+    site = input("Please enter URL to scrape: ")
+    Pagedata(site)  # <-- The magic and the madness happen here
     # Here's a comment just to annoy pep8 dictators ;-)
